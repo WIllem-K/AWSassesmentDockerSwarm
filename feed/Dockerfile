@@ -18,7 +18,7 @@ RUN mvn verify
 # RUN
 FROM openjdk:8u171-jre-alpine
 
-ENTRYPOINT ["java", "-Xmx8m", "-Xms8m", "-jar", "/app/words.jar"]
+ENTRYPOINT ["java", "-Xmx8m", "-Xms8m", "-jar", "/app/feed.jar"]
 EXPOSE 8080
 
 WORKDIR /app

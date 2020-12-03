@@ -4,14 +4,13 @@ import com.google.common.base.Suppliers;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import java.net.InetSocketAddress;
-import java.net.URI;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.NoSuchElementException;
 
 public class Main {
@@ -27,7 +26,7 @@ public class Main {
         server.start();
     }
 
-    private static String fetchHistorical() {
+    private static void fetchHistorical() {
         String pattern = "yyyy-MM-dd";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 
@@ -36,6 +35,7 @@ public class Main {
         String today = simpleDateFormat.format(now);
         String preceedingDay = simpleDateFormat.format(yesterday);
        
+        /* This requires java 11, while this project only has java 8
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.exchangeratesapi.io/history?start_at=" + preceedingDay + "&end_at=" + today
@@ -43,6 +43,7 @@ public class Main {
                 .build();
         client.sendAsync(request, BodyHandlers.ofString()).thenApply(HttpResponse::body).thenAccept(System.out::println)
                 .join();
+        // */
     }
 
     /*

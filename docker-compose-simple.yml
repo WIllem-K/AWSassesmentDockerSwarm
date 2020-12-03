@@ -5,7 +5,7 @@ services:
   db:
     image: assessment/assessment-db
 
-  words:
+  feed:
     image: assessment/assessment-api
     ports:
      - "8080:80"

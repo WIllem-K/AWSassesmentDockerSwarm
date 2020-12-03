@@ -2,11 +2,13 @@
 
 This is a heavily modified version the demo project shown at DockerCon EU 2017.
 
-The demo app runs across two containers:
+The demo app runs across three containers:
 
 - [db](db/Dockerfile) - a Postgres database which stores words
 
-- [words](words/Dockerfile) - a Java REST API which serves words read from the database
+- [feed](feed/Dockerfile) - a Java feed that serves average exchange rates based on what is in the database
+
+- [collector](collector/Dockerfile) - a recurring Java task that fills the database every 10 minutes
 
 ## Build
 

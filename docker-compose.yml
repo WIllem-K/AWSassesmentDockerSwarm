@@ -6,8 +6,8 @@ services:
     build: db
     image: assessment/assessment-db
 
-  words:
-    build: words
+  feed:
+    build: feed
     image: assessment/assessment-api
     ports:
      - "8080:80"
