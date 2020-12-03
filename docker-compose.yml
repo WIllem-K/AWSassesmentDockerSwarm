@@ -9,12 +9,6 @@ services:
   words:
     build: words
     image: assessment/assessment-api
-    deploy:
-      replicas: 5
-
-  web:
-    build: web
-    image: assessment/assessment-web
     ports:
      - "8080:80"
     networks:
