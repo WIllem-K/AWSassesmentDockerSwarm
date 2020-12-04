@@ -2,9 +2,9 @@
 
 This is a heavily modified version the demo project shown at DockerCon EU 2017.
 
-The demo app runs across three containers:
+The app runs across three containers:
 
-- [db](db/Dockerfile) - a Postgres database which stores words
+- [db](db/Dockerfile) - a Postgres database which stores the conversion rate values
 
 - [feed](feed/Dockerfile) - a Java feed that serves average exchange rates based on what is in the database
 
@@ -12,7 +12,7 @@ The demo app runs across three containers:
 
 ## Build
 
-Using docker compose we build the app to run it int he swarm:
+Using docker compose we build the app to run it in the swarm:
 
 ```
 docker-compose build
