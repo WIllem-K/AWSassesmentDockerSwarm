@@ -5,13 +5,32 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import java.net.InetSocketAddress;
 
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.*;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class Main {
 
@@ -26,42 +45,10 @@ public class Main {
         server.start();
     }
 
-    private static void fetchHistorical() {
-        String pattern = "yyyy-MM-dd";
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-
-        Instant now = Instant.now();
-        Instant yesterday = now.minus(1, ChronoUnit.DAYS);
-        String today = simpleDateFormat.format(now);
-        String preceedingDay = simpleDateFormat.format(yesterday);
-       
-        /* This requires java 11, while this project only has java 8
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.exchangeratesapi.io/history?start_at=" + preceedingDay + "&end_at=" + today
-                        + "&base=EUR&symbols=USD"))
-                .build();
-        client.sendAsync(request, BodyHandlers.ofString()).thenApply(HttpResponse::body).thenAccept(System.out::println)
-                .join();
-        // */
-    }
-
-    /*
-     * public static void main(String[] args) throws Exception {
-     * Class.forName("org.postgresql.Driver");
-     * 
-     * HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
-     * server.createContext("/noun", handler(Suppliers.memoize(() ->
-     * randomWord("nouns")))); server.createContext("/verb",
-     * handler(Suppliers.memoize(() -> randomWord("verbs"))));
-     * server.createContext("/adjective", handler(Suppliers.memoize(() ->
-     * randomWord("adjectives")))); server.start(); } //
-     */
-
     private static String querryRates(String table) {
         BigDecimal avarageRates = BigDecimal.ZERO;
         int valuesFound = 0;
-        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://db:5432/postgres", "postgres",
+        try (Connection connection = DriverManager.getConnection("jdbc:postgresql://assessment-db:5432/postgres", "postgres",
                 "")) {
             try (Statement statement = connection.createStatement()) {
                 try (ResultSet set = statement.executeQuery("SELECT conversion " + // querry
@@ -74,7 +61,11 @@ public class Main {
                         avarageRates.add(conversion);
                     }
                 }
+            } catch (Exception e) {
+                System.err.println("Got an exception while updating rates ");
+                System.err.println(e.getMessage());
             }
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -87,24 +78,14 @@ public class Main {
         throw new NoSuchElementException(table);
     }
 
-    private static HttpHandler handler(Supplier<String> word) {
-        return t -> {
-            String response = "{\"word\":\"" + word.get() + "\"}";
-            byte[] bytes = response.getBytes(Charsets.UTF_8);
-
-            System.out.println(response);
-            t.getResponseHeaders().add("content-type", "application/json; charset=utf-8");
-            t.sendResponseHeaders(200, bytes.length);
-
-            try (OutputStream os = t.getResponseBody()) {
-                os.write(bytes);
-            }
-        };
-    }
-
     private static HttpHandler helloHandler() {
+        String whatIsOverage = "'Overage' appears to have different definitions in different businesses. But related to currency exhance rantes it relates to the difference between the value of a prepaid amount and the actual value it has when the transaction is executed.\n";
+        String overageDefined = "So 'hourly overage price' varies based on the transaction and how long it takes to process the transaction. As the assessment asked for 'Hourly Overage' the hypotetical transaction will happen an hour after being pre-paid. It's value will be the remainder of 1 currency unit going either way.";
+        String EURUSD = " Hourly Overage Price EUR to USD: € " + querryRates("eurtousd");
+        String USDEUR = " Hourly Overage Price USD to EUR: $ " + querryRates("usdtoeur");
+
         return t -> {
-            byte[] response = "Hello World from Google App Engine Java 11.".getBytes();
+            byte[] response = (EURUSD + USDEUR).getBytes();
 
             System.out.println(response);
 

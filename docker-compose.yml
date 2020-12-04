@@ -10,9 +10,13 @@ services:
     build: feed
     image: assessment/assessment-api
     ports:
-     - "8080:80"
+     - "8081:80"
     networks:
       - outwards
+
+  collector:
+    build: collector
+    image: assessment/assessment-fill
 
 networks:
   outwards:

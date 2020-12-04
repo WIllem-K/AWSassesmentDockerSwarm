@@ -8,4 +8,7 @@ services:
   feed:
     image: assessment/assessment-api
     ports:
-     - "8080:80"
+     - "8081:80"
+
+  collector:
+    image: assessment/assessment-fill
